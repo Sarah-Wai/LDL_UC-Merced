@@ -1,121 +1,154 @@
-# LDL-SR: Locally Discriminative Learning for Remote-Sensing Super-Resolution
+# LDL-SR on UC Merced: Artifact-Aware Remote-Sensing Super-Resolution
 
 ## Overview
-This project implements Locally Discriminative Learning (LDL) to suppress hallucinated artifacts in GAN-based super-resolution for remote-sensing imagery. The approach integrates LDL into an ESRGAN framework to improve reconstruction fidelity while preserving structural consistency.
+This project applies Locally Discriminative Learning (LDL) to remote-sensing image super-resolution using the UC Merced Land Use dataset.
 
-This work is based on the study:
-Evaluating Locally Discriminative Learning for Hallucination Suppression in Remote-Sensing Super-Resolution.
+The implementation builds upon the original LDL and ESRGAN frameworks and adapts them to a structured aerial imagery domain. The goal is to reduce hallucinated high-frequency artifacts while preserving geometric fidelity.
 
-## Motivation
-GAN-based super-resolution methods can generate visually sharp images but often introduce artificial high-frequency details. These artifacts are problematic in remote sensing, where geometric accuracy is critical. LDL addresses this by applying targeted supervision to unstable regions instead of uniform penalties.
+---
+
+## Contribution
+This project focuses on adaptation and evaluation rather than proposing a new model.
+
+Main contributions:
+- Applied LDL to the UC Merced dataset
+- Built a full training and evaluation pipeline
+- Compared ESRGAN and LDL under consistent settings
+- Conducted both quantitative and qualitative analysis
+
+---
+
+## Repository Structure
+
+LDL_UC-Merced/
+│── Code/
+│   ├── basicsr/
+│   ├── options/
+│   │   ├── train/
+│   │   └── test/
+│   ├── LDL_SR_Training.ipynb
+│   ├── Result&Experiments.ipynb
+│
+│── results/
+│   ├── compare_agricultural_agricultural02.png
+│   ├── compare_buildings_buildings04.png
+│   ├── compare_runway_runway01.png
+│   ├── Table1_UCMerced_ESRGAN_vs_LDL.csv
+│   ├── UCMerced_ESRGAN_vs_LDL_metrics.png
+│   └── UCMerced_qualitative_grid.png
+│
+│── Paper/
+│── README.md
+
+---
 
 ## Method
 
-### Baseline
-- ESRGAN with RRDB architecture
+The project uses ESRGAN as the baseline and integrates LDL to guide artifact-aware learning.
 
-### LDL Components
-1. Residual computation:
-   R = I_HR - I_SR
+Key idea:
+- Compute residual between ground truth and prediction
+- Identify unstable regions using variance
+- Use EMA model as a stable reference
+- Apply targeted loss on artifact-prone areas
 
-2. Local variance estimation to detect unstable regions
+Loss formulation:
+L_total = L_GAN + β * L_artifact
 
-3. EMA-based refinement:
-   Compare predictions from current model and EMA model
-
-4. Loss function:
-   L_total = L_GAN + beta * L_artifact
+---
 
 ## Dataset
+
 UC Merced Land Use Dataset:
 - 2,100 RGB images
-- 21 classes
-- Image size: 256x256
+- 21 scene classes
+- Image size: 256×256
 
 Preprocessing:
-- Downsampling x4 (64x64 input)
-- Train/Validation/Test split: 70/15/15
-- Random crop: 128x128
-- Data augmentation: flips, rotations, HSV jitter
+- Downsample ×4 (to 64×64)
+- Train/validation/test split: 70/15/15
+- Random patch cropping (128×128)
+- Data augmentation (flip, rotation, color jitter)
 
-## Training Setup
-- Optimizer: Adam (beta1=0.9, beta2=0.999)
-- Learning rate: 1e-4 with cosine decay
-- Batch size: 16
-- Training iterations: ~50,000
-- Hardware: NVIDIA T4 GPU (16GB)
+---
 
 ## Results
 
-| Model        | PSNR | SSIM | LPIPS |
-|-------------|------|------|------|
-| ESRGAN      | 21.95 | 0.565 | 0.360 |
-| NoGAN       | 23.39 | 0.623 | 0.372 |
-| SwinIR      | 21.15 | 0.591 | 0.368 |
-| LDL-SR      | 26.18 | 0.741 | 0.212 |
+### Quantitative Comparison
 
-LDL improves both reconstruction fidelity and perceptual quality compared to baseline methods.
+| Model   | PSNR | SSIM | LPIPS |
+|--------|------|------|------|
+| ESRGAN | 21.95 | 0.565 | 0.360 |
+| LDL-SR | 26.18 | 0.741 | 0.212 |
 
-## Key Observations
-- ESRGAN introduces hallucinated textures in structured regions
-- Removing adversarial loss reduces artifacts but weakens detail
-- LDL balances artifact suppression and detail preservation
-- Best improvements observed in structured regions such as urban layouts and agricultural patterns
+Detailed results are available in:
+- results/Table1_UCMerced_ESRGAN_vs_LDL.csv
 
-## Project Structure
-LDL_UC-Merced/
-- LDL_SR_Training.ipynb
-- Result&Experiments.ipynb
-- models/
-- data/
-- utils/
-- README.md
+---
+
+### Qualitative Comparison
+
+![Qualitative Results](results/UCMerced_qualitative_grid.png)
+
+---
+
+### Metrics Visualization
+
+![Metrics](results/UCMerced_ESRGAN_vs_LDL_metrics.png)
+
+---
+
+### Sample Comparisons
+
+Agricultural:
+![Agriculture](results/compare_agricultural_agricultural02.png)
+
+Buildings:
+![Buildings](results/compare_buildings_buildings04.png)
+
+Runway:
+![Runway](results/compare_runway_runway01.png)
+
+---
 
 ## How to Run
 
-1. Clone repository:
-   git clone https://github.com/Sarah-Wai/LDL_UC-Merced.git
-   cd LDL_UC-Merced
+1. Navigate to the Code folder:
+cd Code
 
 2. Install dependencies:
-   pip install -r requirements.txt
+pip install -r requirements.txt
 
 3. Run training:
-   jupyter notebook LDL_SR_Training.ipynb
+jupyter notebook LDL_SR_Training.ipynb
 
-4. View results:
-   jupyter notebook Result&Experiments.ipynb
+4. Run experiments:
+jupyter notebook Result&Experiments.ipynb
 
-## Dependencies
-- Python 3.x
-- PyTorch
-- OpenCV
-- NumPy
-- Matplotlib
-- scikit-image
+---
 
-## Evaluation Metrics
-- PSNR: pixel-level accuracy
-- SSIM: structural similarity
-- LPIPS: perceptual similarity
+## Notes
 
-## Future Work
-- Extend LDL to diffusion-based super-resolution
-- Apply to larger remote-sensing datasets
-- Explore self-supervised approaches
-- Evaluate downstream tasks such as classification and detection
+- This repository includes only essential files and selected results.
+- Large datasets, intermediate outputs, and pretrained models are not included due to size constraints.
+- The implementation is based on the original LDL and ESRGAN codebases.
+
+---
+
+## Paper
+
+The full paper is available in the `Paper/` folder.
+
+---
 
 ## Author
-Wai Phu Paing 
+
+Sarah Wai  
 MSc Computer Science  
 University of Regina
 
-## License
-MIT License
+---
 
-## Citation
-@article{wai2026ldl,
-  title={Evaluating Locally Discriminative Learning for Hallucination Suppression in Remote-Sensing Super-Resolution},
-  author={Wai, Paing and Yao, JingTao},
-  year={2026}
-}
+## License
+
+MIT License
