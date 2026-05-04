@@ -20,25 +20,24 @@ Main contributions:
 
 ## Repository Structure
 
-LDL_UC-Merced/
-│── Code/
-│   ├── basicsr/
-│   ├── options/
-│   │   ├── train/
-│   │   └── test/
-│   ├── LDL_SR_Training.ipynb
-│   ├── Result&Experiments.ipynb
-│
-│── results/
-│   ├── compare_agricultural_agricultural02.png
-│   ├── compare_buildings_buildings04.png
-│   ├── compare_runway_runway01.png
-│   ├── Table1_UCMerced_ESRGAN_vs_LDL.csv
-│   ├── UCMerced_ESRGAN_vs_LDL_metrics.png
-│   └── UCMerced_qualitative_grid.png
-│
-│── Paper/
-│── README.md
+- Code/
+  - basicsr/
+  - options/
+    - train/
+    - test/
+  - LDL_SR_Training.ipynb
+  - Result&Experiments.ipynb
+
+- results/
+  - compare_agricultural_agricultural02.png
+  - compare_buildings_buildings04.png
+  - compare_runway_runway01.png
+  - Table1_UCMerced_ESRGAN_vs_LDL.csv
+  - UCMerced_ESRGAN_vs_LDL_metrics.png
+  - UCMerced_qualitative_grid.png
+
+- Paper/
+- README.md
 
 ---
 
