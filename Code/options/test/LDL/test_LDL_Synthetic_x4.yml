@@ -1,0 +1,46 @@
+name: LDL_Synthetic_UCMerced_x4
+model_type: ESRGANModel
+scale: 4
+num_gpu: 1
+manual_seed: 0
+
+datasets:
+  test_1:
+    name: UCMerced
+    type: PairedImageDataset
+    dataroot_gt: /content/LDL/datasets/UCMerced/test/HR
+    dataroot_lq: /content/LDL/datasets/UCMerced/test/LR_x4
+    io_backend:
+      type: disk
+
+network_g:
+  type: RRDBNet
+  num_in_ch: 3
+  num_out_ch: 3
+  num_feat: 64
+  num_block: 23
+  num_grow_ch: 32
+
+# path
+path:
+  pretrain_network_g: /content/LDL/experiments/LDL_UCMerced_50k/models/net_g_latest.pth
+  param_key_g: params_ema
+  strict_load_g: true
+  results_root: /content/LDL/results/LDL_Synthetic_UCMerced_x4
+  log: /content/LDL/results/LDL_Synthetic_UCMerced_x4
+  visualization: /content/LDL/results/LDL_Synthetic_UCMerced_x4/visualization
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~
+
+  metrics:
+    psnr:
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: true
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: true

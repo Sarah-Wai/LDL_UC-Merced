@@ -1,0 +1,120 @@
+# General settings
+name: ESRGAN_UCMerced_x4
+model_type: ESRGANModel
+scale: 4
+num_gpu: 1
+manual_seed: 0
+
+# Dataset settings
+datasets:
+  train:
+    name: UCMercedTrain
+    type: PairedImageDataset
+    dataroot_gt: /content/LDL/datasets/UCMerced/train/HR
+    dataroot_lq: /content/LDL/datasets/UCMerced/train/LR_x4
+    io_backend:
+      type: disk
+
+    gt_size: 128
+    use_flip: true
+    use_rot: true
+
+    # Dataloader
+    use_shuffle: true
+    num_worker_per_gpu: 2  # Reduced to 2 to avoid warning/freezing
+    batch_size_per_gpu: 8
+    dataset_enlarge_ratio: 1
+
+  val:
+    name: UCMercedVal
+    type: PairedImageDataset
+    dataroot_gt: /content/LDL/datasets/UCMerced/val/HR
+    dataroot_lq: /content/LDL/datasets/UCMerced/val/LR_x4
+    io_backend:
+      type: disk
+
+# Network structures
+network_g:
+  type: RRDBNet
+  num_in_ch: 3
+  num_out_ch: 3
+  num_feat: 64
+  num_block: 23
+  num_grow_ch: 32
+
+network_d:
+  type: VGGStyleDiscriminator128  # FIXED: Changed to a valid architecture
+  num_in_ch: 3
+  num_feat: 64
+
+# Path
+path:
+  # WARNING: Training GAN from scratch is unstable. 
+  # Ideally, point this to a pre-trained PSNR model (e.g. trained with L1 loss only)
+  pretrain_network_g: ~ 
+  param_key_g: params
+  strict_load_g: true
+  resume_state: ~
+
+# Training settings
+train:
+  optim_g:
+    type: Adam
+    lr: !!float 1e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+  optim_d:
+    type: Adam
+    lr: !!float 1e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+
+  scheduler:
+    type: MultiStepLR
+    milestones: [5000, 10000, 20000, 30000] # Added milestones for scheduler
+    gamma: 0.5
+
+  total_iter: 10000
+  warmup_iter: -1
+
+  # Losses
+  pixel_opt:
+    type: L1Loss
+    loss_weight: !!float 1e-2
+    reduction: mean
+  perceptual_opt:
+    type: PerceptualLoss
+    layer_weights:
+      'conv5_4': 1  # FIXED: Standard syntax
+    vgg_type: vgg19
+    use_input_norm: true
+    range_norm: false
+    perceptual_weight: 1.0
+    style_weight: 0
+    criterion: l1
+  gan_opt:
+    type: GANLoss
+    gan_type: vanilla
+    real_label_val: 1.0
+    fake_label_val: 0.0
+    loss_weight: !!float 5e-3
+
+  net_d_iters: 1
+  net_d_init_iters: 0
+
+# Validation settings
+val:
+  val_freq: 2000
+  save_img: true
+
+  metrics:
+    psnr:
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: true
+
+# Logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 2e3
+  use_tb_logger: true

@@ -1,0 +1,44 @@
+name: ESRGAN_UCMerced_noGAN_x4
+model_type: ESRGANModel
+scale: 4
+num_gpu: 1
+manual_seed: 0
+
+datasets:
+  test_1:
+    name: UCMerced
+    type: PairedImageDataset
+    dataroot_gt: /content/drive/MyDrive/LDL/datasets/UCMerced/test/HR
+    dataroot_lq: /content/drive/MyDrive/LDL/datasets/UCMerced/test/LR_x4
+    io_backend:
+      type: disk
+
+network_g:
+  type: RRDBNet
+  num_in_ch: 3
+  num_out_ch: 3
+  num_feat: 64
+  num_block: 23
+  num_grow_ch: 32
+
+path:
+  pretrain_network_g: /content/drive/MyDrive/LDL/experiments/ESRGAN_UCMerced_noGAN_x4/models/net_g_latest.pth
+  param_key_g: params
+  strict_load_g: true
+  results_root: /content/drive/MyDrive/LDL/results/ESRGAN_UCMerced_noGAN_x4
+  log: /content/drive/MyDrive/LDL/results/ESRGAN_UCMerced_noGAN_x4
+  visualization: /content/drive/MyDrive/LDL/results/ESRGAN_UCMerced_noGAN_x4/visualization
+
+val:
+  save_img: true
+  suffix: ~
+
+  metrics:
+    psnr:
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: true
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: true
