@@ -106,7 +106,7 @@ LDL_UC-Merced/
 - Evaluate downstream tasks such as classification and detection
 
 ## Author
-Sarah Wai  
+Wai Phu Paing 
 MSc Computer Science  
 University of Regina
 
@@ -116,6 +116,6 @@ MIT License
 ## Citation
 @article{wai2026ldl,
   title={Evaluating Locally Discriminative Learning for Hallucination Suppression in Remote-Sensing Super-Resolution},
-  author={Wai, Sarah and Yao, JingTao},
+  author={Wai, Paing and Yao, JingTao},
   year={2026}
 }
